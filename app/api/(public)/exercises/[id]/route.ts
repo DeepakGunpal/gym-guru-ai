@@ -1,10 +1,10 @@
-import { fetchExercise } from "@/controller/public";
+import { fetchExercise } from "@/controller/exercise";
 import { connectToDB } from "@/utils/db";
 import { ObjectId } from "mongoose";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: ObjectId } }
 ) {
   await connectToDB();

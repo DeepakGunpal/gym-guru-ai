@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 
-const TrainerSchema = new mongoose.Schema(
+const GymSchema = new mongoose.Schema(
   {
-    name: String,
-    username: String,
+    name: { type: String, required: true },
     email: String,
-    phone: String,
+    number: { type: String, required: true, unique: true },
     bio: String,
     certifications: [String],
     specialties: [String],
@@ -16,20 +15,20 @@ const TrainerSchema = new mongoose.Schema(
     languagesSpoken: [String],
     reviews: [
       {
-        memberId: mongoose.Schema.Types.ObjectId,
+        memberId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
         rating: Number,
         review: String,
       },
     ],
     profilePicture: String,
-    socialMediaLinks: [String],
+    instagram: String,
+    facebook: String,
     website: String,
     location: String,
   },
   { timestamps: true }
 );
 
-const Trainer =
-  mongoose.models.trainer || mongoose.model("trainer", TrainerSchema);
+const Gym = mongoose.models.gym || mongoose.model("gym", GymSchema);
 
-export default Trainer;
+export default Gym;

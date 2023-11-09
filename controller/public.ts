@@ -1,34 +1,113 @@
-import ExerciseModel from "@/models/exercise";
-import { NextResponse } from "next/server";
-import { ObjectId } from "mongoose";
+import { NextRequest, NextResponse } from "next/server";
+import UserModel from "@/models/user";
+import OtpModel from "@/models/otpModel";
+import bcrypt from "bcrypt";
 
-export const fetchExercise = async ({ id }: { id: ObjectId }) => {
-  try {
-    const exercise = await ExerciseModel.findById(id);
-    return NextResponse.json(exercise);
-  } catch (error: any) {
-    return NextResponse.json({ status: 400, message: error?.message });
-  }
-};
-
-export const fetchExercises = async () => {
-  try {
-    const exercises = await ExerciseModel.find();
-    return NextResponse.json(exercises);
-  } catch (error: any) {
-    return NextResponse.json({ status: 400, message: error?.message });
-  }
-};
-
-export const createExercise = async (req: Request) => {
+export const signIn = async (req: NextRequest) => {
   try {
     const data = await req.json();
-    const exercise = await ExerciseModel.create(data);
+    const user = await UserModel.findOne(data);
+    return NextResponse.json(user);
+  } catch (error: any) {
     console.log(
-      "🚀 ~ file: public.ts:8 ~ createExercise ~ exercise:",
-      exercise
+      "🚀 ~ file: public.ts:10 ~ createExercise ~ error:",
+      error?.message
     );
-    return NextResponse.json(exercise);
+    return NextResponse.json({ status: 400, message: error?.message });
+  }
+};
+
+export const signUp = async (req: NextRequest) => {
+  try {
+    const data = await req.json();
+    const user = await UserModel.create(data);
+    return NextResponse.json(user);
+  } catch (error: any) {
+    console.log(
+      "🚀 ~ file: public.ts:10 ~ createExercise ~ error:",
+      error?.message
+    );
+    return NextResponse.json({ status: 400, message: error?.message });
+  }
+};
+
+function generateOTP() {
+  // Generate a random number between 1000 and 9999
+  const otp = Math.floor(1000 + Math.random() * 9000);
+  return otp.toString(); // Convert the number to a string
+}
+
+export const sendOtp = async (req: NextRequest) => {
+  try {
+    const data = await req.json();
+    console.log("🚀 ~ file: public.ts:43 ~ sendOtp ~ data:", data);
+    const user = await UserModel.findOne(data);
+    console.log("🚀 ~ file: public.ts:45 ~ sendOtp ~ user:", user);
+
+    if (!user) {
+      return NextResponse.json({ status: 400, message: "User Not Found" });
+    }
+
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      authorization: process.env.SMS_KEY as string,
+    });
+    console.log("🚀 ~ file: public.ts:38 ~ sendOtp ~ headers:", headers);
+
+    // Example usage
+    const otp = generateOTP();
+    console.log("Random OTP:", otp);
+
+    const sendSms = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        route: "otp",
+        variables_values: otp,
+        numbers: data?.number,
+      }),
+    }).then((res) => res.json());
+    console.log("🚀 ~ file: public.ts:52 ~ sendOtp ~ sendSms:", sendSms);
+
+    if (sendSms?.return) {
+      await OtpModel.create({
+        ...data,
+        otp,
+      });
+      return NextResponse.json({ status: 200, body: "Otp Sent Successfully" });
+    }
+
+    return NextResponse.json(
+      { status: false, message: "Failed To Send Otp" },
+      { status: 400 }
+    );
+  } catch (error: any) {
+    console.log(
+      "🚀 ~ file: public.ts:10 ~ createExercise ~ error:",
+      error?.message
+    );
+    return NextResponse.json(
+      { status: false, message: error?.message },
+      { status: 400 }
+    );
+  }
+};
+
+export const verifyOtp = async (req: NextRequest) => {
+  try {
+    const data = await req.json();
+    const { number, otp } = data;
+    //todo verify otp
+    const otps = await OtpModel.find({ number }).lean();
+    if (otps.length === 0) throw new Error("Otp Expired");
+
+    //todo verify the latest otp by taking last saved doc with provided number
+    const lastOTP = otps[otps.length - 1];
+    const verifyOtp = await bcrypt.compare(otp, lastOTP.otp);
+    if (!verifyOtp) throw new Error("Incorrect otp");
+    await OtpModel.deleteMany({ number });
+
+    return NextResponse.json({ status: 200, message: "OTP Verified" });
   } catch (error: any) {
     console.log(
       "🚀 ~ file: public.ts:10 ~ createExercise ~ error:",

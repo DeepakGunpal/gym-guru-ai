@@ -1,16 +1,21 @@
 import mongoose from "mongoose";
 
-const MemberSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
-    fullName: String,
-    username: String,
+    name: { type: String, required: true },
     email: String,
-    phone: String,
+    number: { type: String, required: true, unique: true },
     dateOfBirth: Date,
     gender: {
       type: String,
-      enum: ["male", "female", "lgbtq"],
+      enum: ["male", "female", "other"],
     },
+    type: {
+      type: String,
+      enum: ["user", "trainer", "admin"],
+      default: "user",
+    },
+    access: [String],
     fitnessGoals: [String],
     fitnessLevel: String,
     preferredWorkoutTypes: [String],
@@ -23,7 +28,7 @@ const MemberSchema = new mongoose.Schema(
         weightUsed: Number,
       },
     ],
-    membershipStatus: String,
+    usershipStatus: String,
     paymentHistory: [
       {
         date: Date,
@@ -54,10 +59,12 @@ const MemberSchema = new mongoose.Schema(
       workoutPlans: [mongoose.Schema.Types.ObjectId],
       nutritionPlan: String,
     },
+    isDeleted: { type: Boolean, default: false },
+    createdBy: { type: String, default: null },
   },
   { timestamps: true }
 );
 
-const Member = mongoose.models.member || mongoose.model("member", MemberSchema);
+const User = mongoose.models.user || mongoose.model("user", UserSchema);
 
-export default Member;
+export default User;

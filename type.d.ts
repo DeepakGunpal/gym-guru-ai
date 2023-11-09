@@ -41,12 +41,12 @@ interface Exercise {
   description?: string;
   targetedBodyPart: MajorBodyPart; // New field
   reps?: {
-    noob: { set?: number; reps?: number }[];
-    beginner: { set?: number; reps?: number }[];
-    intermediate: { set?: number; reps?: number }[];
-    advanced: { set?: number; reps?: number }[];
-    elite: { set?: number; reps?: number }[];
-    freak: { set?: number; reps?: number }[];
+    noob: number[];
+    beginner: number[];
+    intermediate: number[];
+    advanced: number[];
+    elite: number[];
+    freak: number[];
   };
   type?: "Body Weight" | "External Weight";
   image?: string;
