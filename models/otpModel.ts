@@ -12,11 +12,4 @@ const otpSchema = new mongoose.Schema(
 
 const Otp = mongoose.models.otp || mongoose.model("otp", otpSchema);
 
-//todo hash otp before saving
-otpSchema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt(10);
-  this.otp = await bcrypt.hash(this.otp, salt);
-  next();
-});
-
 export default Otp;

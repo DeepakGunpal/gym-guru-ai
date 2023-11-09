@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import UserModel from "@/models/user";
 import OtpModel from "@/models/otpModel";
 import bcrypt from "bcrypt";
+import GymModel from "@/models/gym";
+import mongoose from "mongoose";
 
 export const signIn = async (req: NextRequest) => {
   try {
@@ -70,9 +72,10 @@ export const sendOtp = async (req: NextRequest) => {
     console.log("🚀 ~ file: public.ts:52 ~ sendOtp ~ sendSms:", sendSms);
 
     if (sendSms?.return) {
+      const salt = await bcrypt.genSalt(10);
       await OtpModel.create({
         ...data,
-        otp,
+        otp: await bcrypt.hash(otp, salt),
       });
       return NextResponse.json({ status: 200, body: "Otp Sent Successfully" });
     }
@@ -108,6 +111,32 @@ export const verifyOtp = async (req: NextRequest) => {
     await OtpModel.deleteMany({ number });
 
     return NextResponse.json({ status: 200, message: "OTP Verified" });
+  } catch (error: any) {
+    console.log(
+      "🚀 ~ file: public.ts:10 ~ createExercise ~ error:",
+      error?.message
+    );
+    return NextResponse.json({ status: 400, message: error?.message });
+  }
+};
+
+export const fetchAllGym = async () => {
+  try {
+    const gyms = await GymModel.find().lean();
+    return NextResponse.json(gyms);
+  } catch (error: any) {
+    console.log(
+      "🚀 ~ file: public.ts:10 ~ createExercise ~ error:",
+      error?.message
+    );
+    return NextResponse.json({ status: 400, message: error?.message });
+  }
+};
+
+export const fetchGym = async (req: NextRequest, { id }: { id: string }) => {
+  try {
+    const gym = await GymModel.findById(new mongoose.Types.ObjectId(id)).lean();
+    return NextResponse.json({ status: true, data: gym });
   } catch (error: any) {
     console.log(
       "🚀 ~ file: public.ts:10 ~ createExercise ~ error:",
