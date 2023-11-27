@@ -8,15 +8,17 @@ const workoutPlanSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "trainer", // Reference to the trainer who created the plan
     },
+    planType: { type: String, enum: ["DayWise", "MuscleGroup"] },
     exercises: [
       {
+        day: {
+          type: String,
+        },
         exercise: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "exercise", // Reference to exercises included in the plan
         },
-        sets: Number, // Number of sets for the exercise
-        reps: Number, // Number of repetitions per set
-        restBetweenSets: Number, // Rest duration between sets (in seconds)
+        reps: [Number], // Number of repetitions per set
       },
     ],
     duration: Number, // Duration of the workout plan (in minutes)

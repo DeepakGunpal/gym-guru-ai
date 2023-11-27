@@ -1,15 +1,15 @@
-import { createExercise, fetchExercises } from "@/controller/exercise";
+import { createWorkoutPlan, fetchWorkoutPlan } from "@/controller/exercise";
 import { connectToDB } from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   await connectToDB();
-  return fetchExercises(req);
+  return fetchWorkoutPlan(req);
 }
 
 export async function POST(req: NextRequest) {
   await connectToDB();
-  return createExercise(req);
+  return createWorkoutPlan(req);
 }
 
 export async function PUT() {

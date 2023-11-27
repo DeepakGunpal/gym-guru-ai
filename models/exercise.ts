@@ -6,7 +6,17 @@ const ExerciseSchema = new mongoose.Schema(
     description: String,
     targetedBodyPart: {
       type: String,
-      enum: ["chest", "tricep", "shoulder", "back", "bicep", "leg", "abs"],
+      enum: [
+        "chest",
+        "tricep",
+        "shoulder",
+        "back",
+        "bicep",
+        "leg",
+        "abs",
+        "traps",
+        "rear delt",
+      ],
     },
     reps: {
       noob: [Number],
@@ -20,7 +30,7 @@ const ExerciseSchema = new mongoose.Schema(
       type: String,
       enum: ["Body Weight", "External Weight"],
     },
-    imageOrVideo: String,
+    image: String,
     difficultyLevel: {
       type: String,
       enum: ["noob", "beginner", "intermediate", "advanced", "elite", "freak"],
@@ -39,14 +49,6 @@ const ExerciseSchema = new mongoose.Schema(
       },
     ],
     videoTutorials: String,
-    historyAndTracking: [
-      {
-        date: Date,
-        sets: Number,
-        reps: Number,
-        weightUsed: Number,
-      },
-    ],
     safetyPrecautions: [String],
   },
   { timestamps: true }

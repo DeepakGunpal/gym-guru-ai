@@ -12,9 +12,9 @@ export async function GET(
 }
 
 export async function PUT() {
-  return NextResponse.json("Hello from User PUT requet!");
+  return NextResponse.json("Hello from User PUT request!");
 }
 
 export async function PATCH() {
-  return NextResponse.json("Hello from User PATCH requet!");
+  return NextResponse.json("Hello from User PATCH request!");
 }
